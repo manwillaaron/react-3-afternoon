@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-
+import axios from 'axios';
 import './App.css';
-
+import Post from './Post/Post'
 import Header from './Header/Header';
 import Compose from './Compose/Compose';
+
+import { ToastContainer, toast } from 'react-toastify';
+
 
 class App extends Component {
   constructor() {
@@ -19,19 +22,46 @@ class App extends Component {
   }
   
   componentDidMount() {
-
-  }
-
-  updatePost() {
+    axios
+    .get('https://practiceapi.devmountain.com/api/posts')
+    
+    .then(res =>{
+      this.setState({
+        posts: res.data
+      })
+    })
   
   }
 
-  deletePost() {
-
+  updatePost(id ,text) {
+    console.log('hit update post')
+  axios.put(`https://practiceapi.devmountain.com/api/posts?id= ${id}` , {text})
+  .then( res => {
+    console.log(res);
+    this.setState({
+      posts: res.data
+    })
+  })
   }
 
-  createPost() {
+  deletePost(id) {
+    axios.delete(`https://practiceapi.devmountain.com/api/posts?id= ${id}`)
+    .then(res => {
+      this.setState({
+        posts: res.data
+      })
+    })
+  }
 
+  createPost(text) {
+    axios.post(`https://practiceapi.devmountain.com/api/posts`, {text})
+    .then(res=> {
+      this.setState({
+        posts: res.data
+      })
+    }
+      
+    )
   }
 
   render() {
@@ -43,8 +73,20 @@ class App extends Component {
 
         <section className="App__content">
 
-          <Compose />
-          
+          <Compose  createPostFn = {this.createPost}/>
+          {
+            posts.map(post => (
+              <Post 
+              key={post.id} 
+              text={post.text}
+              date= {post.date}
+              updatePostFn = {this.updatePost}
+              id = {post.id}
+              deletePostFn = {this.deletePost}
+             
+              />
+            ))
+          }
         </section>
       </div>
     );
